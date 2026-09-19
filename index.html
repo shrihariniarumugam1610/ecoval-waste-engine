@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoVal AI - Industrial Waste Valorization & Symbiosis Engine</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js for ROI & Economics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .gauge-circle {
+      transition: stroke-dashoffset 0.8s ease-in-out, stroke 0.5s ease;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen">
+
+  <!-- TOP NAVIGATION -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-emerald-500/20">
+          ♻️
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-bold text-lg text-white tracking-tight">EcoVal AI</h1>
+            <span class="px-2 py-0.5 text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-full">v2.4 Symbiosis Engine</span>
+          </div>
+          <p class="text-xs text-slate-400">Autonomous Industrial Waste Valorization & Decision Support</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="hidden sm:flex items-center gap-2 text-xs bg-slate-800/80 border border-slate-700/60 px-3 py-1.5 rounded-lg text-slate-300">
+          <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          AI Model: <span class="text-emerald-400 font-semibold">XAI-ValorNet v3</span>
+        </div>
+        <button onclick="resetDefaults()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg transition border border-slate-700">
+          Reset Demo
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 py-6">
+
+    <!-- PIPELINE STEPPER -->
+    <div class="mb-6 p-3 bg-slate-800/50 border border-slate-800 rounded-2xl overflow-x-auto">
+      <div class="flex items-center justify-between min-w-[700px] text-xs font-medium text-slate-400">
+        <div class="flex items-center gap-2 text-emerald-400 font-semibold">
+          <span class="h-6 w-6 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">1</span>
+          Waste Input
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-600"></i>
+        <div class="flex items-center gap-2 text-emerald-400 font-semibold">
+          <span class="h-6 w-6 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">2</span>
+          Dynamic Quality
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-600"></i>
+        <div class="flex items-center gap-2 text-emerald-400 font-semibold">
+          <span class="h-6 w-6 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">3</span>
+          Cost vs ROI
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-600"></i>
+        <div class="flex items-center gap-2 text-emerald-400 font-semibold">
+          <span class="h-6 w-6 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">4</span>
+          Market Demand
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-600"></i>
+        <div class="flex items-center gap-2 text-emerald-400 font-semibold">
+          <span class="h-6 w-6 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">5</span>
+          Local Matching
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-600"></i>
+        <div class="flex items-center gap-2 text-emerald-400 font-semibold">
+          <span class="h-6 w-6 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">6</span>
+          Explainable AI
+        </div>
+      </div>
+    </div>
+
+    <!-- GRID LAYOUT: LEFT CONTROLS, RIGHT RESULTS -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- LEFT: INPUT CONTROLS (4 COLS) -->
+      <section class="lg:col-span-4 space-y-4">
+        <div class="bg-slate-800/80 border border-slate-700/70 rounded-2xl p-5 shadow-xl">
+          <div class="flex items-center gap-2 mb-4 pb-3 border-b border-slate-700">
+            <i data-lucide="sliders" class="w-5 h-5 text-emerald-400"></i>
+            <h2 class="font-bold text-white text-base">Industrial Waste Input</h2>
+          </div>
+
+          <form id="wasteForm" onsubmit="event.preventDefault(); runAnalysis();" class="space-y-4 text-sm">
+            
+            <!-- Waste Type -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Waste Stream Type</label>
+              <select id="wasteType" onchange="runAnalysis()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-500 transition">
+                <option value="plastic_pp">Plastic - Polypropylene (PP Industrial Scrap)</option>
+                <option value="plastic_pet">Plastic - PET Bottles / Flakes</option>
+                <option value="agro_husk">Agro-Biomass - Rice Husk & Straw</option>
+                <option value="metal_alu">Metal - Aluminium Swarf & Shavings</option>
+                <option value="textile_cotton">Textile - Post-Industrial Cotton Cutters</option>
+              </select>
+            </div>
+
+            <!-- Quantity Slider -->
+            <div>
+              <div class="flex justify-between text-xs font-semibold text-slate-300 mb-1">
+                <span>Batch Quantity</span>
+                <span class="text-emerald-400 font-bold" id="quantityLabel">120 kg/day</span>
+              </div>
+              <input type="range" id="quantity" min="20" max="1000" step="10" value="120" 
+                     oninput="document.getElementById('quantityLabel').innerText = this.value + ' kg/day'; runAnalysis();"
+                     class="w-full accent-emerald-500 cursor-pointer h-2 bg-slate-700 rounded-lg" />
+              <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+                <span>20 kg</span>
+                <span>500 kg</span>
+                <span>1,000 kg</span>
+              </div>
+            </div>
+
+            <!-- Contamination Level -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1.5">Contamination Level</label>
+              <div class="grid grid-cols-3 gap-2">
+                <label class="cursor-pointer">
+                  <input type="radio" name="contamination" value="low" checked onchange="runAnalysis()" class="peer sr-only" />
+                  <div class="text-center py-2 px-1 rounded-xl border border-slate-700 peer-checked:border-emerald-500 peer-checked:bg-emerald-500/10 peer-checked:text-emerald-400 text-xs font-medium text-slate-400 transition">
+                    Low (&lt;5%)
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="contamination" value="med" onchange="runAnalysis()" class="peer sr-only" />
+                  <div class="text-center py-2 px-1 rounded-xl border border-slate-700 peer-checked:border-amber-500 peer-checked:bg-amber-500/10 peer-checked:text-amber-400 text-xs font-medium text-slate-400 transition">
+                    Medium (~15%)
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="contamination" value="high" onchange="runAnalysis()" class="peer sr-only" />
+                  <div class="text-center py-2 px-1 rounded-xl border border-slate-700 peer-checked:border-rose-500 peer-checked:bg-rose-500/10 peer-checked:text-rose-400 text-xs font-medium text-slate-400 transition">
+                    High (&gt;30%)
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Material Condition -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Physical Condition</label>
+              <select id="condition" onchange="runAnalysis()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-emerald-500">
+                <option value="clean_dry">Dry, Clean & Pre-sorted</option>
+                <option value="mild_moisture">Mild Moisture / Unwashed</option>
+                <option value="mixed">Mixed with Inert Debris</option>
+              </select>
+            </div>
+
+            <!-- Factory Location -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Industrial Cluster / Hub</label>
+              <div class="relative">
+                <select id="location" onchange="runAnalysis()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-emerald-500">
+                  <option value="guindy">Guindy Industrial Estate, Chennai</option>
+                  <option value="ambattur">Ambattur Industrial Estate, Chennai</option>
+                  <option value="coimbatore">SIDCO Industrial Estate, Coimbatore</option>
+                  <option value="peenya">Peenya Industrial Area, Bengaluru</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Optimization Goal Toggle -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Optimization Priority</label>
+              <div class="grid grid-cols-3 gap-1.5 bg-slate-900 p-1 rounded-xl border border-slate-700/80">
+                <button type="button" onclick="setPriority('profit')" id="btn-profit" class="py-1.5 text-[11px] font-semibold rounded-lg bg-emerald-500 text-slate-950 transition">
+                  Max Profit
+                </button>
+                <button type="button" onclick="setPriority('speed')" id="btn-speed" class="py-1.5 text-[11px] font-medium rounded-lg text-slate-400 hover:text-white transition">
+                  Quick Liquid
+                </button>
+                <button type="button" onclick="setPriority('eco')" id="btn-eco" class="py-1.5 text-[11px] font-medium rounded-lg text-slate-400 hover:text-white transition">
+                  Max ESG
+                </button>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="w-full mt-2 py-3 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-bold rounded-xl shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 transition active:scale-[0.99]">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+              Run Valorization Engine
+            </button>
+          </form>
+        </div>
+
+        <!-- ESG / Impact Badge Mini Card -->
+        <div class="bg-gradient-to-br from-emerald-950/40 to-slate-900 border border-emerald-500/30 rounded-2xl p-4 flex items-center gap-4">
+          <div class="h-12 w-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-2xl">
+            🌱
+          </div>
+          <div class="text-xs">
+            <div class="font-bold text-emerald-300 text-sm" id="co2Savings">184 kg CO₂e Offset</div>
+            <div class="text-slate-400" id="landfillDiverted">120 kg waste diverted from landfill</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: ANALYSIS DASHBOARD (8 COLS) -->
+      <section class="lg:col-span-8 space-y-5">
+
+        <!-- ROW 1: QUALITY SCORE & FINANCIAL ECONOMICS -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
+          
+          <!-- DYNAMIC QUALITY SCORE (5 COLS) -->
+          <div class="md:col-span-5 bg-slate-800/80 border border-slate-700/70 rounded-2xl p-5 flex flex-col justify-between shadow-lg">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Dynamic Quality Score</span>
+              <span id="qualityBadge" class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">Grade A</span>
+            </div>
+
+            <!-- Gauge Chart -->
+            <div class="flex flex-col items-center justify-center my-3 relative">
+              <svg class="w-36 h-36 transform -rotate-90">
+                <circle cx="72" cy="72" r="58" stroke="currentColor" stroke-width="12" class="text-slate-700" fill="transparent" />
+                <circle id="gaugeCircle" cx="72" cy="72" r="58" stroke="currentColor" stroke-width="12" 
+                        class="text-emerald-400 gauge-circle" 
+                        stroke-dasharray="364" 
+                        stroke-dashoffset="43" 
+                        stroke-linecap="round" 
+                        fill="transparent" />
+              </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center">
+                <span id="scoreValue" class="text-3xl font-extrabold text-white">88</span>
+                <span class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">out of 100</span>
+              </div>
+            </div>
+
+            <!-- Quality Breakdown Bars -->
+            <div class="space-y-1.5 text-xs">
+              <div class="flex justify-between text-slate-300 text-[11px]">
+                <span>Purity Index:</span>
+                <span id="purityVal" class="font-bold text-emerald-400">92%</span>
+              </div>
+              <div class="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                <div id="purityBar" class="bg-emerald-400 h-full rounded-full" style="width: 92%"></div>
+              </div>
+
+              <div class="flex justify-between text-slate-300 text-[11px] pt-1">
+                <span>Processability:</span>
+                <span id="processVal" class="font-bold text-teal-300">Optimal</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- PROCESSING COST + POTENTIAL VALUE (7 COLS) -->
+          <div class="md:col-span-7 bg-slate-800/80 border border-slate-700/70 rounded-2xl p-5 shadow-lg flex flex-col justify-between">
+            <div class="flex items-center justify-between border-b border-slate-700 pb-2.5">
+              <div class="flex items-center gap-2">
+                <i data-lucide="calculator" class="w-4 h-4 text-emerald-400"></i>
+                <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Economics & Net Margin</span>
+              </div>
+              <span id="roiBadge" class="text-xs font-extrabold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/30">+125% ROI</span>
+            </div>
+
+            <!-- 3 Stat Cards -->
+            <div class="grid grid-cols-3 gap-2 my-3">
+              <div class="bg-slate-900/90 border border-slate-700/60 rounded-xl p-2.5 text-center">
+                <div class="text-[10px] text-slate-400 font-medium">Processing Cost</div>
+                <div id="costVal" class="text-base font-extrabold text-rose-400 mt-0.5">₹4,000</div>
+                <div class="text-[9px] text-slate-500">Labor & Power</div>
+              </div>
+              <div class="bg-slate-900/90 border border-slate-700/60 rounded-xl p-2.5 text-center">
+                <div class="text-[10px] text-slate-400 font-medium">Recovered Value</div>
+                <div id="revVal" class="text-base font-extrabold text-teal-300 mt-0.5">₹9,000</div>
+                <div class="text-[9px] text-slate-500">Finished Product</div>
+              </div>
+              <div class="bg-emerald-950/40 border border-emerald-500/40 rounded-xl p-2.5 text-center">
+                <div class="text-[10px] text-emerald-400 font-semibold">Net Potential</div>
+                <div id="netProfitVal" class="text-base font-extrabold text-emerald-300 mt-0.5">+₹5,000</div>
+                <div class="text-[9px] text-emerald-500 font-medium">vs ₹2,400 raw</div>
+              </div>
+            </div>
+
+            <!-- Mini Chart Comparison -->
+            <div class="h-28 w-full">
+              <canvas id="roiChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 2: MARKET DEMAND & RECOMMENDED PRODUCT -->
+        <div class="bg-slate-800/80 border border-slate-700/70 rounded-2xl p-5 shadow-lg">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-700 pb-3">
+            <div>
+              <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">AI Valorization Recommendation</span>
+              <h3 id="targetProduct" class="text-lg font-bold text-white flex items-center gap-2 mt-0.5">
+                <span>Interlocking Recycled Paving Tiles</span>
+                <span class="text-xs font-normal text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30">Top Pick</span>
+              </h3>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="text-right">
+                <div class="text-[10px] text-slate-400 uppercase font-semibold">Market Demand</div>
+                <div id="demandStatus" class="text-xs font-bold text-emerald-400 flex items-center gap-1 justify-end">
+                  <i data-lucide="trending-up" class="w-3.5 h-3.5"></i> High Demand (+18% YoY)
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Comparative Pathways Table -->
+          <div class="mt-4 overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="text-[10px] text-slate-500 uppercase bg-slate-900/60 rounded">
+                <tr>
+                  <th class="p-2">Potential Pathway</th>
+                  <th class="p-2">Capex/Processing</th>
+                  <th class="p-2">Market Demand</th>
+                  <th class="p-2">Net Realization</th>
+                  <th class="p-2 text-right">Feasibility</th>
+                </tr>
+              </thead>
+              <tbody id="pathwaysBody" class="divide-y divide-slate-700/50">
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ROW 3: LOCAL PROCESSOR MATCHING & EXPLAINABLE AI (2 COLS) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          
+          <!-- LOCAL PROCESSOR MATCHING -->
+          <div class="bg-slate-800/80 border border-slate-700/70 rounded-2xl p-5 shadow-lg flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between border-b border-slate-700 pb-2.5 mb-3">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="map-pin" class="w-4 h-4 text-emerald-400"></i>
+                  <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Local Symbiosis Matches</span>
+                </div>
+                <span class="text-[11px] text-emerald-400 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30">Radius: &lt;15 km</span>
+              </div>
+              <p class="text-xs text-slate-400 mb-3">Verified processors nearby with active intake demand for your batch:</p>
+
+              <div id="processorsList" class="space-y-2.5">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-slate-700/80 text-[11px] text-slate-400 flex items-center justify-between">
+              <span>Logistics Emission: <b>~4.2 kg CO₂</b></span>
+              <span class="text-emerald-400 font-semibold">Zero Inter-State Freight</span>
+            </div>
+          </div>
+
+          <!-- EXPLAINABLE AI (XAI) "WHY THIS RECOMMENDATION?" -->
+          <div class="bg-slate-800/80 border border-emerald-500/30 bg-gradient-to-br from-slate-800/90 to-emerald-950/20 rounded-2xl p-5 shadow-lg flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between border-b border-slate-700 pb-2.5 mb-3">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="brain-circuit" class="w-4 h-4 text-emerald-400"></i>
+                  <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Explainable AI (XAI) Rationale</span>
+                </div>
+                <span class="text-[10px] bg-slate-900 text-slate-300 px-2 py-0.5 rounded border border-slate-700 font-mono">Confidence: 94.6%</span>
+              </div>
+              
+              <div class="text-xs text-slate-300 space-y-2.5" id="xaiList">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+
+            <div class="mt-4 p-2.5 bg-slate-900/90 rounded-xl border border-slate-700/80 flex items-center justify-between">
+              <div class="text-[11px] text-slate-400">Decision Rule:</div>
+              <div class="text-[11px] font-mono text-emerald-300" id="xaiRuleCode">Max(NetROI) where Distance &lt; 15km</div>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <!-- MATCH DETAIL MODAL -->
+  <div id="connectModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h4 class="font-bold text-base text-white flex items-center gap-2">
+          <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i>
+          Initiate Symbiosis Dispatch
+        </h4>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-white">&times;</button>
+      </div>
+      <p class="text-xs text-slate-300" id="modalText">
+        Connecting with processor...
+      </p>
+      <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 text-xs font-mono text-emerald-300 space-y-1">
+        <div>> Batch: 120 kg Polypropylene</div>
+        <div>> Quality Score: 88/100 (Grade A)</div>
+        <div>> Dispatch Estimate: 1 Truck (Light Commercial)</div>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="simulateSend()" id="sendBtn" class="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs transition">
+          Confirm & Send Match RFP
+        </button>
+        <button onclick="closeModal()" class="px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-xs transition">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT ENGINE -->
+  <script>
+    let currentPriority = 'profit';
+    let roiChartInstance = null;
+
+    // Database of profiles for each waste type
+    const wasteDatabase = {
+      plastic_pp: {
+        name: "Polypropylene (PP Scrap)",
+        baseQuality: 92,
+        costPerKg: 33,
+        targetProduct: "Interlocking Recycled Paving Tiles",
+        recoveredValuePerKg: 75,
+        rawScrapRate: 20,
+        demand: "High (+18% YoY)",
+        co2Factor: 1.53,
+        pathways: [
+          { name: "Paving Tiles (Compression Molding)", capex: "Low", demand: "High", net: "₹5,000", badge: "Optimal", color: "emerald" },
+          { name: "Pelletizing / Extrusion", capex: "Medium", demand: "Medium", net: "₹3,200", badge: "Moderate", color: "slate" },
+          { name: "Raw Scrap Sale (Kabadi/Dealer)", capex: "Zero", demand: "Constant", net: "₹2,400", badge: "Suboptimal", color: "rose" }
+        ],
+        processors: [
+          { name: "Guindy EcoPolymers Ltd", dist: "6.4 km", intake: "50-500 kg/day", status: "Active Intake" },
+          { name: "South Plast Symbiosis Unit", dist: "11.2 km", intake: "100-1000 kg/day", status: "Verified Buyer" }
+        ]
+      },
+      plastic_pet: {
+        name: "PET Bottles & Shreds",
+        baseQuality: 88,
+        costPerKg: 28,
+        targetProduct: "Polyester Staple Fiber (Geo-textiles)",
+        recoveredValuePerKg: 68,
+        rawScrapRate: 22,
+        demand: "Very High (+24% YoY)",
+        co2Factor: 1.72,
+        pathways: [
+          { name: "Recycled Polyester Staple Fiber", capex: "High", demand: "Very High", net: "₹4,800", badge: "Optimal", color: "emerald" },
+          { name: "Thermoformed Packaging Trays", capex: "Medium", demand: "High", net: "₹3,600", badge: "Feasible", color: "slate" },
+          { name: "Baled Scrap Sale", capex: "Zero", demand: "High", net: "₹2,640", badge: "Base", color: "rose" }
+        ],
+        processors: [
+          { name: "Ambattur Fiber Recovery Hub", dist: "4.8 km", intake: "100-800 kg/day", status: "Active Intake" },
+          { name: "Chennai CleanTech Polymers", dist: "14.1 km", intake: "200-2000 kg/day", status: "Verified Buyer" }
+        ]
+      },
+      agro_husk: {
+        name: "Rice Husk & Agro Biomass",
+        baseQuality: 82,
+        costPerKg: 14,
+        targetProduct: "Silica-Rich Biochar & Briquettes",
+        recoveredValuePerKg: 42,
+        rawScrapRate: 8,
+        demand: "Surging (+31% Industrial Fuel)",
+        co2Factor: 2.1,
+        pathways: [
+          { name: "High-Calorific Fuel Briquettes", capex: "Low", demand: "High", net: "₹3,360", badge: "Optimal", color: "emerald" },
+          { name: "Precipitated Silica Extraction", capex: "High", demand: "Medium", net: "₹2,900", badge: "Feasible", color: "slate" },
+          { name: "Mulching / Open Composting", capex: "Zero", demand: "Low", net: "₹960", badge: "Low Return", color: "rose" }
+        ],
+        processors: [
+          { name: "Kovai Green Fuels & Briquetting", dist: "9.5 km", intake: "200-5000 kg/day", status: "Active Intake" },
+          { name: "Thermal Power Agro-Co-generation", dist: "18.0 km", intake: "500-10000 kg/day", status: "Verified" }
+        ]
+      },
+      metal_alu: {
+        name: "Aluminium Swarf & Turnings",
+        baseQuality: 94,
+        costPerKg: 45,
+        targetProduct: "Secondary Foundry Ingots (ADC12)",
+        recoveredValuePerKg: 160,
+        rawScrapRate: 90,
+        demand: "Extremely High (Automotive Hub)",
+        co2Factor: 4.8,
+        pathways: [
+          { name: "De-oiled Briquetting -> Ingot Casting", capex: "Medium", demand: "Very High", net: "₹13,800", badge: "Optimal", color: "emerald" },
+          { name: "Alum Chemical Grade Synthesis", capex: "High", demand: "Medium", net: "₹10,500", badge: "Alternative", color: "slate" },
+          { name: "Unprocessed Chip Sale", capex: "Zero", demand: "High", net: "₹10,800", badge: "Base", color: "rose" }
+        ],
+        processors: [
+          { name: "Ambattur Alloy Castings", dist: "3.2 km", intake: "50-1000 kg/day", status: "Immediate Need" },
+          { name: "Madras Non-Ferrous Foundries", dist: "8.7 km", intake: "100-3000 kg/day", status: "Verified Buyer" }
+        ]
+      },
+      textile_cotton: {
+        name: "Post-Industrial Cotton Waste",
+        baseQuality: 85,
+        costPerKg: 20,
+        targetProduct: "Acoustic Insulation Panels",
+        recoveredValuePerKg: 58,
+        rawScrapRate: 15,
+        demand: "Moderate (+12% Green Building)",
+        co2Factor: 1.4,
+        pathways: [
+          { name: "Thermal-Bonded Acoustic Felt Panels", capex: "Medium", demand: "High", net: "₹4,560", badge: "Optimal", color: "emerald" },
+          { name: "Rotor Spinning Shoddy Yarn", capex: "Medium", demand: "Medium", net: "₹3,100", badge: "Feasible", color: "slate" },
+          { name: "Shredded Raw Rags", capex: "Zero", demand: "Low", net: "₹1,800", badge: "Suboptimal", color: "rose" }
+        ],
+        processors: [
+          { name: "Tirupur EcoFiber Innovations", dist: "7.1 km", intake: "100-2000 kg/day", status: "Active Intake" },
+          { name: "GreenAcoustics Manufacturing", dist: "13.5 km", intake: "50-500 kg/day", status: "Verified" }
+        ]
+      }
+    };
+
+    function setPriority(type) {
+      currentPriority = type;
+      ['profit', 'speed', 'eco'].forEach(p => {
+        const btn = document.getElementById(`btn-${p}`);
+        if(p === type) {
+          btn.className = "py-1.5 text-[11px] font-semibold rounded-lg bg-emerald-500 text-slate-950 transition";
+        } else {
+          btn.className = "py-1.5 text-[11px] font-medium rounded-lg text-slate-400 hover:text-white transition";
+        }
+      });
+      runAnalysis();
+    }
+
+    function runAnalysis() {
+      const typeKey = document.getElementById('wasteType').value;
+      const data = wasteDatabase[typeKey];
+      const qty = parseInt(document.getElementById('quantity').value);
+      const contamination = document.querySelector('input[name="contamination"]:checked').value;
+      const condition = document.getElementById('condition').value;
+
+      // 1. DYNAMIC QUALITY SCORE CALCULATION
+      let quality = data.baseQuality;
+      if (contamination === 'med') quality -= 14;
+      if (contamination === 'high') quality -= 34;
+
+      if (condition === 'mild_moisture') quality -= 6;
+      if (condition === 'mixed') quality -= 16;
+      quality = Math.max(25, Math.min(99, quality));
+
+      // Update Gauge
+      document.getElementById('scoreValue').innerText = quality;
+      const circle = document.getElementById('gaugeCircle');
+      const circumference = 2 * Math.PI * 58; // ~364.4
+      const offset = circumference - (circumference * (quality / 100));
+      circle.style.strokeDashoffset = offset;
+
+      // Badge & Color
+      const badge = document.getElementById('qualityBadge');
+      if (quality >= 80) {
+        badge.innerText = "Grade A (Premium Valorization)";
+        badge.className = "text-[11px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/30";
+        circle.setAttribute('class', 'text-emerald-400 gauge-circle');
+      } else if (quality >= 60) {
+        badge.innerText = "Grade B (Standard Processable)";
+        badge.className = "text-[11px] font-bold px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/30";
+        circle.setAttribute('class', 'text-amber-400 gauge-circle');
+      } else {
+        badge.innerText = "Grade C (Requires Pre-treatment)";
+        badge.className = "text-[11px] font-bold px-2 py-0.5 rounded-md bg-rose-500/10 text-rose-400 border border-rose-500/30";
+        circle.setAttribute('class', 'text-rose-400 gauge-circle');
+      }
+
+      document.getElementById('purityVal').innerText = `${quality}%`;
+      document.getElementById('purityBar').style.width = `${quality}%`;
+
+      // 2. ECONOMICS / FINANCIAL MATH
+      let effectiveCostPerKg = data.costPerKg;
+      if (contamination === 'high') effectiveCostPerKg += 10; // extra cleaning cost
+      
+      const totalCost = Math.round(qty * effectiveCostPerKg);
+      const totalRev = Math.round(qty * data.recoveredValuePerKg * (quality / 100));
+      const netProfit = totalRev - totalCost;
+      const rawScrapVal = Math.round(qty * data.rawScrapRate);
+      const roi = Math.round((netProfit / totalCost) * 100);
+
+      document.getElementById('costVal').innerText = `₹${totalCost.toLocaleString('en-IN')}`;
+      document.getElementById('revVal').innerText = `₹${totalRev.toLocaleString('en-IN')}`;
+      document.getElementById('netProfitVal').innerText = (netProfit >= 0 ? `+₹` : `-₹`) + Math.abs(netProfit).toLocaleString('en-IN');
+      document.getElementById('netProfitVal').className = `text-base font-extrabold ${netProfit >= 0 ? 'text-emerald-300' : 'text-rose-400'} mt-0.5`;
+      document.getElementById('roiBadge').innerText = `${roi}% ROI`;
+
+      // Update Chart
+      renderChart(totalCost, totalRev, netProfit, rawScrapVal);
+
+      // 3. TARGET PRODUCT & DEMAND
+      document.getElementById('targetProduct').firstElementChild.innerText = data.targetProduct;
+      document.getElementById('demandStatus').innerHTML = `<i data-lucide="trending-up" class="w-3.5 h-3.5"></i> ${data.demand}`;
+
+      // Pathways Table
+      const tbody = document.getElementById('pathwaysBody');
+      tbody.innerHTML = '';
+      data.pathways.forEach((p, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = idx === 0 ? "bg-emerald-500/5 font-semibold text-white" : "hover:bg-slate-800/60";
+        tr.innerHTML = `
+          <td class="p-2 flex items-center gap-1.5">
+            ${idx === 0 ? '<span class="text-emerald-400">★</span>' : ''} ${p.name}
+          </td>
+          <td class="p-2 text-slate-400">${p.capex}</td>
+          <td class="p-2">${p.demand}</td>
+          <td class="p-2 font-mono ${idx === 0 ? 'text-emerald-400 font-bold' : 'text-slate-300'}">${p.net}</td>
+          <td class="p-2 text-right">
+            <span class="px-2 py-0.5 rounded text-[10px] ${idx === 0 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-slate-700 text-slate-300'}">${p.badge}</span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // 4. LOCAL PROCESSORS LIST
+      const procList = document.getElementById('processorsList');
+      procList.innerHTML = '';
+      data.processors.forEach(proc => {
+        const item = document.createElement('div');
+        item.className = "p-3 bg-slate-900/90 border border-slate-700/80 rounded-xl flex items-center justify-between hover:border-emerald-500/50 transition";
+        item.innerHTML = `
+          <div>
+            <div class="font-bold text-white text-xs flex items-center gap-1.5">
+              ${proc.name}
+              <span class="text-[9px] bg-emerald-500/10 text-emerald-400 px-1.5 py-0.2 rounded border border-emerald-500/30">Verified</span>
+            </div>
+            <div class="text-[10px] text-slate-400 mt-0.5 flex items-center gap-3">
+              <span>📍 ${proc.dist}</span>
+              <span>📦 Demand: ${proc.intake}</span>
+            </div>
+          </div>
+          <button onclick="openModal('${proc.name}', '${proc.dist}')" class="px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500 text-emerald-300 hover:text-slate-950 font-bold rounded-lg text-[11px] transition border border-emerald-500/30">
+            Connect
+          </button>
+        `;
+        procList.appendChild(item);
+      });
+
+      // 5. EXPLAINABLE AI (XAI) RATIONALE LIST
+      const xaiList = document.getElementById('xaiList');
+      xaiList.innerHTML = `
+        <div class="flex items-start gap-2">
+          <span class="text-emerald-400 mt-0.5">✔</span>
+          <span><b>Quality Feasibility:</b> Score of ${quality}/100 exceeds the 75-point threshold required for direct extrusion & compression.</span>
+        </div>
+        <div class="flex items-start gap-2">
+          <span class="text-emerald-400 mt-0.5">✔</span>
+          <span><b>Economic Arbitrage:</b> Valorizing generates +₹${netProfit.toLocaleString('en-IN')} net margin, outperforming simple scrap disposal by <b>${Math.round((netProfit/rawScrapVal)*100)}%</b>.</span>
+        </div>
+        <div class="flex items-start gap-2">
+          <span class="text-emerald-400 mt-0.5">✔</span>
+          <span><b>Symbiosis Proximity:</b> Local buyer available within ${data.processors[0].dist}, slashing logistic freight costs & vehicle emissions.</span>
+        </div>
+        <div class="flex items-start gap-2">
+          <span class="text-emerald-400 mt-0.5">✔</span>
+          <span><b>Market Absorption:</b> Construction demand in Chennai/Coimbatore zone currently absorbs 100% of finished tiles.</span>
+        </div>
+      `;
+
+      // 6. ESG METRICS
+      const co2 = Math.round(qty * data.co2Factor);
+      document.getElementById('co2Savings').innerText = `${co2} kg CO₂e Offset`;
+      document.getElementById('landfillDiverted').innerText = `${qty} kg industrial waste diverted`;
+
+      lucide.createIcons();
+    }
+
+    function renderChart(cost, revenue, net, rawScrap) {
+      const ctx = document.getElementById('roiChart').getContext('2d');
+      if (roiChartInstance) roiChartInstance.destroy();
+
+      roiChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Raw Scrap', 'Proc. Cost', 'Gross Rev', 'Net Margin'],
+          datasets: [{
+            data: [rawScrap, cost, revenue, net],
+            backgroundColor: [
+              'rgba(148, 163, 184, 0.4)', // slate
+              'rgba(244, 63, 94, 0.7)',   // rose
+              'rgba(45, 212, 191, 0.7)',  // teal
+              'rgba(16, 185, 129, 0.9)'   // emerald
+            ],
+            borderRadius: 6,
+            borderSkipped: false
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => ` ₹${ctx.raw.toLocaleString('en-IN')}`
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { color: '#94a3b8', font: { size: 10 } }
+            },
+            y: {
+              grid: { color: '#334155' },
+              ticks: { color: '#94a3b8', font: { size: 9 }, callback: (v) => '₹' + v }
+            }
+          }
+        }
+      });
+    }
+
+    function openModal(name, dist) {
+      document.getElementById('modalText').innerText = `Direct match established with ${name} (${dist}). Generating AI Industrial Symbiosis Handover Contract...`;
+      document.getElementById('connectModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('connectModal').classList.add('hidden');
+    }
+
+    function simulateSend() {
+      const btn = document.getElementById('sendBtn');
+      btn.innerText = "Dispatch Request Sent! ✔";
+      btn.className = "flex-1 py-2.5 bg-slate-700 text-emerald-400 font-bold rounded-xl text-xs";
+      setTimeout(() => {
+        closeModal();
+        btn.innerText = "Confirm & Send Match RFP";
+        btn.className = "flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs transition";
+      }, 1400);
+    }
+
+    function resetDefaults() {
+      document.getElementById('wasteType').value = 'plastic_pp';
+      document.getElementById('quantity').value = 120;
+      document.getElementById('quantityLabel').innerText = '120 kg/day';
+      document.querySelector('input[name="contamination"][value="low"]').checked = true;
+      document.getElementById('condition').value = 'clean_dry';
+      setPriority('profit');
+    }
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', () => {
+      runAnalysis();
+    });
+  </script>
+</body>
+</html>
